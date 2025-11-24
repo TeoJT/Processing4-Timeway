@@ -2669,21 +2669,21 @@ public class PApplet implements PConstants {
       if (key == ESC) {
         exit();
       }
-      // When running tethered to the Processing application, respond to
-      // Ctrl-W (or Cmd-W) events by closing the sketch. Not enabled when
-      // running independently, because this sketch may be one component
-      // embedded inside an application that has its own close behavior.
-      if (external &&
-          event.getKeyCode() == 'W' &&
-          ((event.isMetaDown() && platform == MACOS) ||
-           (event.isControlDown() && platform != MACOS))) {
-        // Can't use this native stuff b/c the native event might be NEWT
-//      if (external && event.getNative() instanceof java.awt.event.KeyEvent &&
-//          ((java.awt.event.KeyEvent) event.getNative()).getModifiers() ==
-//            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() &&
-//          event.getKeyCode() == 'W') {
-        exit();
-      }
+
+      
+      // TEO TAYLOR NEON CHANGE:
+      // Remove this ctrl+w key combination that force-closes a sketch.
+//       if (external &&
+//           event.getKeyCode() == 'W' &&
+//           ((event.isMetaDown() && platform == MACOS) ||
+//            (event.isControlDown() && platform != MACOS))) {
+//         // Can't use this native stuff b/c the native event might be NEWT
+// //      if (external && event.getNative() instanceof java.awt.event.KeyEvent &&
+// //          ((java.awt.event.KeyEvent) event.getNative()).getModifiers() ==
+// //            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() &&
+// //          event.getKeyCode() == 'W') {
+//         exit();
+//       }
     }
   }
 

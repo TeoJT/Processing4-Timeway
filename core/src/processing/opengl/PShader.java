@@ -716,7 +716,9 @@ public class PShader implements PConstants {
   }
 
 
-  protected void setUniformMatrix(int loc, float[] mat) {
+  // TEO TAYLOR NEON CHANGE:
+  // Change from protected to public
+  public void setUniformMatrix(int loc, float[] mat) {
     if (-1 < loc) {
       updateFloatBuffer(mat);
       if (mat.length == 4) {
@@ -743,15 +745,43 @@ public class PShader implements PConstants {
   }
 
 
+  
+  // TEO TAYLOR NEON CHANGE:
+  // Optimisation to set existing uniform rather than creating a new object.
   protected void setUniformImpl(String name, int type, Object value) {
     if (uniformValues == null) {
       uniformValues = new HashMap<>();
     }
-    uniformValues.put(name, new UniformValue(type, value));
+
+    // Optimisation here.
+    if (uniformValues.containsKey(name)) {
+      uniformValues.get(name).set(type, value);
+    }
+    else {
+      uniformValues.put(name, new UniformValue(type, value));
+    }
   }
 
 
-  protected void consumeUniforms() {
+  // TEO TAYLOR NEON CHANGE:
+  // Optimisation to set existing uniform rather than creating a new object.
+  protected void setUniformImpl(String name, int type, Object value) {
+    if (uniformValues == null) {
+      uniformValues = new HashMap<>();
+    }
+
+    // Optimisation here.
+    if (uniformValues.containsKey(name)) {
+      uniformValues.get(name).set(type, value);
+    }
+    else {
+      uniformValues.put(name, new UniformValue(type, value));
+    }
+  }
+
+  // TEO TAYLOR NEON CHANGE:
+  // Optimisation for checking if uniform has actually been modified
+  public void consumeUniforms() {
     if (uniformValues != null && 0 < uniformValues.size()) {
       int unit = 0;
       for (String name: uniformValues.keySet()) {
@@ -763,6 +793,12 @@ public class PShader implements PConstants {
           continue;
         }
         UniformValue val = uniformValues.get(name);
+
+        // Optimisation
+        if (!val.modified) {
+          continue;
+        }
+
         if (val.type == UniformValue.INT1) {
           int[] v = ((int[])val.value);
           pgl.uniform1i(loc, v[0]);
@@ -848,6 +884,9 @@ public class PShader implements PConstants {
           }
           unit++;
         }
+
+        // Mark as no longer modifed
+        val.modified = false;
       }
       uniformValues.clear();
     }
@@ -1185,7 +1224,9 @@ public class PShader implements PConstants {
   }
 
 
-  protected void setCommonUniforms() {
+  // TEO TAYLOR NEON CHANGE:
+  // Change from protected to public
+  public void setCommonUniforms() {
     if (-1 < transformMatLoc) {
       currentPG.updateGLProjmodelview();
       setUniformMatrix(transformMatLoc, currentPG.glProjmodelview);
@@ -1465,6 +1506,9 @@ public class PShader implements PConstants {
     static final int MAT3      = 17;
     static final int MAT4      = 18;
     static final int SAMPLER2D = 19;
+    
+    // TEO TAYLOR CHANGE: Add modified variable
+    public boolean modified = true;
 
     int type;
     Object value;
@@ -1472,6 +1516,13 @@ public class PShader implements PConstants {
     UniformValue(int type, Object value) {
       this.type = type;
       this.value = value;
+    }
+    
+    // TEO TAYLOR CHANGE: Add set method
+    public void set(int type, Object value) {
+      this.type = type;
+      this.value = value;
+      modified = true;
     }
   }
 }

@@ -6389,7 +6389,9 @@ public class PGraphicsOpenGL extends PGraphics {
   }
 
 
-  protected Object initCache(PImage img) {
+  // TEO TAYLOR NEON CHANGE:
+  // Change from protected to public
+  public Object initCache(PImage img) {
     if (!checkGLThread()) {
       return null;
     }
